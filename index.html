@@ -59,8 +59,11 @@
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-      // Connect to the Socket.IO server
-      const socket = io("http://localhost:3000");
+      // Update the connection URL to point to Nginx load balancer
+      const socket = io("http://localhost:3002", {
+        transports: ["websocket"],
+        path: "/socket.io/",
+      });
 
       // DOM elements
       const connectionStatus = document.getElementById("connection-status");

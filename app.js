@@ -3,8 +3,9 @@ const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
   cors: {
-    origin: "http://127.0.0.1:5500", // Allow Live Server's default port
+    origin: "*",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
