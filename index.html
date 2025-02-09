@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Chat</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      #messages {
+        height: 300px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        padding: 10px;
+        overflow-y: auto;
+      }
+      #message-form {
+        display: flex;
+        gap: 10px;
+      }
+      #message-input {
+        flex-grow: 1;
+        padding: 8px;
+      }
+      button {
+        padding: 8px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .status {
+        color: #666;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Socket.IO Chat</h1>
+    <div id="connection-status" class="status">Connecting...</div>
+    <div id="messages"></div>
+
+    <form id="message-form">
+      <input
+        type="text"
+        id="message-input"
+        placeholder="Type your message..."
+        autocomplete="off"
+      />
+      <button type="submit">Send</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      // Connect to the Socket.IO server
+      const socket = io("http://localhost:3000");
+
+      // DOM elements
+      const connectionStatus = document.getElementById("connection-status");
+      const messagesDiv = document.getElementById("messages");
+      const messageForm = document.getElementById("message-form");
+      const messageInput = document.getElementById("message-input");
+
+      // Connection status handling
+      socket.on("connect", () => {
+        connectionStatus.textContent = "Connected!";
+        connectionStatus.style.color = "#4CAF50";
+      });
+
+      socket.on("disconnect", () => {
+        connectionStatus.textContent = "Disconnected";
+        connectionStatus.style.color = "#f44336";
+      });
+
+      // Message handling
+      messageForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+
+        if (message) {
+          // Emit the message to the server
+          socket.emit("chat message", message);
+
+          // Add message to the messages div
+          addMessage("You: " + message);
+
+          // Clear input
+          messageInput.value = "";
+        }
+      });
+
+      // Listen for incoming messages
+      socket.on("chat message", (msg) => {
+        addMessage("Other: " + msg);
+      });
+
+      // Helper function to add messages to the messages div
+      function addMessage(message) {
+        const messageElement = document.createElement("div");
+        messageElement.textContent = message;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
